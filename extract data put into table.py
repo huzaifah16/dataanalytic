@@ -5,11 +5,11 @@ import pandas as pd
 import re
 
 def analis(reading):
-    string1 = "Recommended Citation"    
-    for number, line in enumerate(reading):
-        if string1 in line:
-            break
-    return number; 
+    string1 = "Recommended Citation"  
+    string2 = "Available at: https:"
+    number = reading.find(string1)
+    stopnumber = reading.find(string2)
+    return number, stopnumber; 
 
 def breaking(rujuk):
     top_row = "Name | Year | Blank | Title | Jounal"
@@ -28,8 +28,14 @@ def breaking(rujuk):
         
         #print(senarai)
         return senarai
-    
-directory = r'E:\Belajar Master in Maritime Technology\GITHUB HUZAIFAH16\ken-batcher-pp-ocr\testfolder\test'
+
+def wraptext(text):
+    x = text.replace("\n\n", "&&&&&&&&&&&&&&&&&")
+    x = x.replace("\n", " ")
+    x = x.replace("&&&&&&&&&&&&&&&&&", "\n")
+    x = re.sub("=+\s[a-zA-Z]+\s[0-9]+\s=+", " ", x)
+    x = re.sub("=+", " ", x)
+    return x
 
 for folder in os.listdir(directory):
     my_dict = {"File_Name":[],"Citation":[]}
@@ -48,12 +54,12 @@ for folder in os.listdir(directory):
             number = analis(reading)
             #maklmat1 = f_name + " ######### " + str(number+2)
             #print(maklmat1)
-            maklumat2 = reading[number+2]
+            maklumat2 = reading[number+21:stopnumber]
             sama = re.search(r'\s\([0-9]+\)+\s', maklumat2)
             
             if sama:
                 my_dict["File_Name"].append(f_name)
-                rujuk = reading[number+2]
+                rujuk = reading[number+21:stopnumber]
                 my_dict["Citation"].append(rujuk)
                 senarai = breaking(rujuk)
 
@@ -72,7 +78,7 @@ for folder in os.listdir(directory):
                         my_dict[key] = value
                         
                     
-                citation.append(reading[number+2])
+                citation.append(reading[number+21:stopnumber])
                 
 
             else:
